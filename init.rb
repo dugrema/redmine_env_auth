@@ -8,12 +8,14 @@ Redmine::Plugin.register :redmine_env_auth do
   version "1.1"
 
   Redmine::MenuManager.map :account_menu do |menu|
+    # Note : link /signout est capture par NGINX pour rediriger
+
     # hide the logout link if an automatic login is active
-    menu.delete :logout
-    menu.push :logout, :signout_path, :html => {:method => "post"}, :if => Proc.new {
-      env_auth_disabled = Setting.plugin_redmine_env_auth["enabled"] != "true"
-      User.current.logged? and env_auth_disabled
-    }, :after => :my_account
+    # menu.delete :logout
+    # menu.push :logout, :signout_path, :html => {:method => "post"}, :if => Proc.new {
+    #   env_auth_disabled = Setting.plugin_redmine_env_auth["enabled"] != "true"
+    #   User.current.logged? and env_auth_disabled
+    # }, :after => :my_account
   end
 
   settings :partial => "settings/redmine_env_auth_settings",
