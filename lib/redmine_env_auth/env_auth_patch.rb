@@ -40,7 +40,7 @@ module RedmineEnvAuth
             return true if ("admins" == allow_other_login) and user.admin?
             return true if ("users" == allow_other_login) and allow_other_login_users.include?(user.login)
           end
-          false
+          true
         end
 
         def find_current_user_with_envauth
@@ -106,39 +106,41 @@ module RedmineEnvAuth
         def register_if_exists_in_ldap login
           # search all ldap sources for a user with the given name and if found,
           # create a user with that name in redmine.
-          auth_sources = AuthSource.where :type => "AuthSourceLdap"
-          if 0 == auth_sources.count
-            logger.debug "redmine_env_auth: no ldap source found"
+          # auth_sources = AuthSource.where :type => "AuthSourceLdap"
+          # if 0 == auth_sources.count
+          #   logger.debug "redmine_env_auth: no ldap source found"
+          #   return
+          # end
+          # attributes that redmine requires for creating a user
+          # required_attrs = [:firstname, :lastname, :mail]
+          # auth_sources.find do |auth_source|
+          #   users = auth_source.search login
+          #   next if 0 == users.length
+          #   ldap_user = users.first
+          #   next if login != ldap_user[:login]
+          #   missing_attrs = required_attrs - ldap_user.keys
+          #   if 0 < missing_attrs.length
+          #     logger.debug "redmine_env_auth: missing attributes #{missing_attrs} from ldap, cant create user"
+          #     next
+          #   end
+
+          user = User.new ldap_user.slice(:login, :login, :login)
+          user.login = ldap_user[:login]
+          # registered users will be able to log in using ldap if redmine_env_auth is disabled.
+          # an alternative would be to not set auth_source_id, users without password can not log in.
+          user.auth_source_id = auth_source.id
+          if user.save
+            user.reload
+            logger.debug "redmine_env_auth: user creation after ldap sync successful"
+            return user
+          else
+            logger.error "redmine_env_auth: user creation after ldap sync failed"
             return
           end
-          # attributes that redmine requires for creating a user
-          required_attrs = [:firstname, :lastname, :mail]
-          auth_sources.find do |auth_source|
-            users = auth_source.search login
-            next if 0 == users.length
-            ldap_user = users.first
-            next if login != ldap_user[:login]
-            missing_attrs = required_attrs - ldap_user.keys
-            if 0 < missing_attrs.length
-              logger.debug "redmine_env_auth: missing attributes #{missing_attrs} from ldap, cant create user"
-              next
-            end
-            user = User.new ldap_user.slice(:firstname, :lastname, :mail)
-            user.login = ldap_user[:login]
-            # registered users will be able to log in using ldap if redmine_env_auth is disabled.
-            # an alternative would be to not set auth_source_id, users without password can not log in.
-            user.auth_source_id = auth_source.id
-            if user.save
-              user.reload
-              logger.debug "redmine_env_auth: user creation after ldap sync successful"
-              return user
-            else
-              logger.error "redmine_env_auth: user creation after ldap sync failed"
-              return
-            end
-          end
-          logger.debug "redmine_env_auth: no user found via ldap"
-          nil
+
+          # end
+          # logger.debug "redmine_env_auth: no user found via ldap"
+          # nil
         end
 
         if self.respond_to?(:alias_method_chain) # Rails < 5
