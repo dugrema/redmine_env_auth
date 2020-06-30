@@ -22,7 +22,7 @@ Redmine::Plugin.register :redmine_env_auth do
       "allow_other_login_users" => "",
       "enabled" => "true",
       "env_variable_name" => "HTTP_USER_PRIVE",
-      "ldap_checked_auto_registration" => "false",
+      "ldap_checked_auto_registration" => "true",
       "redmine_user_property" => "login",
       "remove_suffix" => ""
     }
