@@ -47,7 +47,7 @@ module RedmineEnvAuth
           plugin_disabled = Setting.plugin_redmine_env_auth["enabled"] != "true"
           if plugin_disabled then return find_current_user_without_envauth end
           user = find_current_user_without_envauth
-          if user and allow_other_login? user then
+          if user and user.login == remote_user and allow_other_login? user then
             if "login" == request.env["action_controller.instance"].action_name
               logger.debug "redmine_env_auth: ignoring active session and showing login form"
               reset_session
