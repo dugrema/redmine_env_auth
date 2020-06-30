@@ -20,7 +20,7 @@ Redmine::Plugin.register :redmine_env_auth do
 
   settings :partial => "settings/redmine_env_auth_settings",
     :default => {
-      "allow_other_login" => "admins",
+      "allow_other_login" => "disabled",
       "allow_other_login_users" => "",
       "enabled" => "true",
       "env_variable_name" => "HTTP_USER_PRIVE",
