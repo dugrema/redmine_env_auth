@@ -20,8 +20,8 @@ Redmine::Plugin.register :redmine_env_auth do
     :default => {
       "allow_other_login" => "admins",
       "allow_other_login_users" => "",
-      "enabled" => "false",
-      "env_variable_name" => "REMOTE_USER",
+      "enabled" => "true",
+      "env_variable_name" => "HTTP_USER_PRIVE",
       "ldap_checked_auto_registration" => "false",
       "redmine_user_property" => "login",
       "remove_suffix" => ""
